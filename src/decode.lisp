@@ -174,8 +174,11 @@
       (error 'invalid-package-name :value package-name :reason "Not a string."))
     (let ((package (find-package package-name)))
       (unless package
-        (error 'invalid-package-name :value package-name
-                                     :reason "Package does not exist."))
+        (restart-case
+            (error 'invalid-package-name :value package-name
+                                         :reason "Package does not exist.")
+          (use-value (new-value)
+            (setf package new-value))))
       package)))
 
 (defvar *intern-symbols* nil)
@@ -275,4 +278,3 @@
                             (end-of-file () (setf eof t) (values)))
               until eof
               collect object)))))
-
